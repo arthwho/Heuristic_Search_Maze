@@ -107,7 +107,7 @@ def astar(start, goal):
     return None
 
 # Desenha o mapa na tela com Pygame
-def draw_map(screen, path=[], current_pos=None, cost=0, elapsed_time=0):
+def draw_map(screen, path=[], current_pos=None, cost=0, elapsed_time=0, steps=0):
     screen.fill((0, 0, 0))
     colors = {'.': (200, 200, 200), '~': (100, 100, 255), 'R': (255, 0, 0), 'P': (139, 69, 19), '#': (50, 50, 50),
               'D': (255, 165, 0), 'L': (255, 165, 0), 'M': (255, 165, 0), 'W': (255, 165, 0)}  # Destinos destacados
@@ -120,6 +120,7 @@ def draw_map(screen, path=[], current_pos=None, cost=0, elapsed_time=0):
                 color = (255, 255, 0)
             pygame.draw.rect(screen, color, (x * tile_size, y * tile_size, tile_size, tile_size))
     font = pygame.font.Font(None, 24)
+    
     text = font.render(f'Custo: {cost}', True, (255, 255, 255))
     text_rect = text.get_rect()
     text_rect.topleft = (10, 10)
@@ -128,9 +129,15 @@ def draw_map(screen, path=[], current_pos=None, cost=0, elapsed_time=0):
     
     time_text = font.render(f'Tempo: {elapsed_time:.2f}s', True, (255, 255, 255))
     time_text_rect = time_text.get_rect()
-    time_text_rect.topleft = (10, 40)
+    time_text_rect.topleft = (10, 30)
     pygame.draw.rect(screen, (0, 0, 0), time_text_rect)
     screen.blit(time_text, time_text_rect)
+
+    steps_text = font.render(f'Passos: {steps}', True, (255, 255, 255))
+    steps_text_rect = steps_text.get_rect()
+    steps_text_rect.topleft = (10, 50)
+    pygame.draw.rect(screen, (0, 0, 0), steps_text_rect)
+    screen.blit(steps_text, steps_text_rect)
     
     pygame.display.flip()
 
@@ -141,6 +148,7 @@ def main():
     current_pos = positions['E']
     total_path = []
     total_cost = 0
+    total_steps = 0
     
     start_time = time.time()
     
@@ -161,9 +169,10 @@ def main():
                     print(f'Encontrou a saída na posição: {step}')
                 total_cost += char_to_terrain[current_terrain]
                 total_path.append(step)
+                total_steps += 1
                 elapsed_time = time.time() - start_time
-                draw_map(screen, total_path, step, total_cost, elapsed_time)
-                time.sleep(0.1)
+                draw_map(screen, total_path, step, total_cost, elapsed_time, total_steps)
+                time.sleep(0.05)
                 previous_terrain = current_terrain
             current_pos = positions[person]
     
@@ -171,6 +180,7 @@ def main():
     elapsed_time = end_time - start_time
     print(f'Custo total: {total_cost}')
     print(f'Tempo total: {elapsed_time:.2f} segundos')
+    print(f'Total de passos: {total_steps}')
     
     while True:
         for event in pygame.event.get():
